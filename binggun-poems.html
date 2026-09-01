@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>冰棍诗集</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    background:#0d0f12;
+    color:#e8e8e8;
+    font-family:"Noto Serif SC","Songti SC","STSong",serif;
+}
+
+.container{
+    display:flex;
+    height:100vh;
+}
+
+/* ================= 左侧 ================= */
+
+.sidebar{
+    width:330px;
+    min-width:330px;
+    height:100vh;
+    overflow-y:auto;
+    background:#12151a;
+    border-right:1px solid #292d33;
+    padding:45px 25px;
+}
+
+.logo{
+    margin-bottom:38px;
+}
+
+.logo h1{
+    margin:0;
+    font-family:"Microsoft YaHei",sans-serif;
+    font-size:28px;
+    font-weight:500;
+    letter-spacing:5px;
+}
+
+.logo p{
+    margin:10px 0 0;
+    color:#666d77;
+    font-family:"Microsoft YaHei",sans-serif;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+/* 时间线 */
+
+.timeline{
+    position:relative;
+    padding-left:25px;
+}
+
+.timeline::before{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:4px;
+    bottom:4px;
+    width:1px;
+    background:#343941;
+}
+
+.item{
+    position:relative;
+    padding:0 0 27px 18px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.item::before{
+    content:"";
+    position:absolute;
+    left:-24px;
+    top:5px;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#343941;
+    border:2px solid #12151a;
+    transition:.25s;
+}
+
+.item:hover{
+    transform:translateX(3px);
+}
+
+.item:hover::before,
+.item.active::before{
+    background:#ddd;
+    box-shadow:0 0 10px #aaa;
+}
+
+.date{
+    margin-bottom:6px;
+    color:#666d77;
+    font-family:"Microsoft YaHei",sans-serif;
+    font-size:12px;
+    letter-spacing:1px;
+}
+
+.title{
+    color:#cfd2d6;
+    font-size:16px;
+    line-height:1.5;
+}
+
+.item.active .title{
+    color:#fff;
+}
+
+/* ================= 右侧 ================= */
+
+.content{
+    flex:1;
+    height:100vh;
+    overflow-y:auto;
+}
+
+.poem{
+    max-width:850px;
+    min-height:100%;
+    margin:0 auto;
+    padding:100px 70px;
+    animation:fade .4s ease;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.poem-date{
+    margin-bottom:18px;
+    color:#707780;
+    font-family:"Microsoft YaHei",sans-serif;
+    font-size:13px;
+    letter-spacing:2px;
+}
+
+.poem-title{
+    margin:0 0 45px;
+    font-size:38px;
+    font-weight:400;
+    letter-spacing:4px;
+}
+
+.poem-body{
+    color:#d8d8d8;
+    font-size:20px;
+    line-height:2.15;
+    letter-spacing:2px;
+    white-space:pre-line;
+}
+
+.footer{
+    margin-top:80px;
+    padding-top:20px;
+    border-top:1px solid #292d33;
+    color:#555b64;
+    font-family:"Microsoft YaHei",sans-serif;
+    font-size:12px;
+}
+
+/* 滚动条 */
+
+::-webkit-scrollbar{
+    width:6px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#333840;
+    border-radius:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+/* ================= 手机 ================= */
+
+@media(max-width:700px){
+
+    body{
+        overflow:auto;
+    }
+
+    .container{
+        display:block;
+        height:auto;
+    }
+
+    .sidebar{
+        width:100%;
+        min-width:0;
+        height:auto;
+        max-height:45vh;
+        padding:25px 20px;
+    }
+
+    .content{
+        height:auto;
+        min-height:55vh;
+    }
+
+    .poem{
+        padding:55px 28px;
+    }
+
+    .poem-title{
+        font-size:30px;
+    }
+
+    .poem-body{
+        font-size:18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 左侧时间线 -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h1>冰棍诗集</h1>
+            <p>POEMS · 2022—2026</p>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+
+    </aside>
+
+
+    <!-- 右侧诗歌 -->
+    <main class="content">
+        <article class="poem" id="poem"></article>
+    </main>
+
+</div>
+
+
+<script>
+
+/*
+ * 冰棍诗集
+ * 按日期从早到晚排列
+ */
+
+const poems = [
+
+    {
+        date:"2022 / 05 / 03",
+        title:"五菱宏光",
+        text:`四驱旋风轮，千里开上坡。
+山林赛越野，雪地虐豪车。`
+    },
+
+    {
+        date:"2022 / 07 / 08",
+        title:"记备中考",
+        text:`奋笔疾书阑珊下，冥思苦想烈日间。
+人生转折高低处，兴趣放后中考先。`
+    },
+
+    {
+        date:"2022 / 09 / 30",
+        title:"秋景",
+        text:`轻风难将枯叶吹，零落满地遮芳菲
+且叹孤芳独自赏，低人不解高处晖`
+    },
+
+    {
+        date:"2023 / 05 / 03",
+        title:"记游cp29",
+        text:`轻风缓过木叶归，晴天飘雨空落虹。
+长征二万五千里，翻山越岭险重重。
+涌江入河水渠辟，润滋沃土生机荣。
+突封破锁新文化，不退求进择善从。`
+    },
+
+    {
+        date:"2023 / 06 / 05",
+        title:"墙",
+        text:`悈心慎语不言恐，
+欢声笑意虚实中。
+十炮升空无炮响，
+一人掩耳万人聋。`
+    },
+
+    {
+        date:"2023 / 09 / 16",
+        title:"记炸柜",
+        text:`不慎风声走，悄然万祸袭。
+物烬内心寒，战败权势离。
+遥望星天远，下观阡陌棘。
+笑叹生起落，未来悲欢弥。`
+    },
+
+    {
+        date:"2023 / 12 / 03",
+        title:"习访沪赋",
+        text:`使大道封路，荒于山郊之坟墓；
+防弹背心，硬于下界之合金；
+警笛鸣鸣，响于试卷之听力；
+驻守晶哥，报以消防之迷理；
+帘席遮阙，阴于幽壑之沟壁；
+户牖禁闭，闷于蒸锅之笼底；
+使上海之人，不敢言而敢怒。`
+    },
+
+    {
+        date:"2024 / 03 / 16",
+        title:"望虎门",
+        text:`天高京城远，地广水域昌。
+烟销民心痪，港闭四海荒。
+风袭波涛起，帆扬旧旗僵。
+火焚枯藤木，地复蔽花芳。`
+    },
+
+    {
+        date:"2024 / 12 / 15",
+        title:"学牲",
+        text:`朝五晚九睡眠轻，万题千科学业重。
+规矩教化本心弃，等级驯服奴隶从。
+青逝春去年岁长，卷墨纸飞山峦崇。
+昔日范进近日举，今日书牲何日囚？`
+    },
+
+    {
+        date:"2025 / 03 / 15",
+        title:"忆泊头行",
+        text:`正月初七春节罄，尚存寒假一丝秋
+缰不羁马鸟不笼，暂别亲戚访友朋
+十四火车成人票，十八才独住酒楼
+携手共游泊头地，破冰踩雪访商荣
+无案无牍无尘网，有云有花有裳容
+设酒杀鸡直 OD ，三日乐胜三年愁
+逝者如斯朝暮去，浮生若梦片时休
+万里铁路云和月，伴我渡江越壑丘
+归来往复苦差役，业重学杂烦事稠
+摧眉折腰权贵酗，河东河西莫欺穷！
+蛰伏暂且安天命，待得春雷震九州
+他时若遂秋收义，哪无仓杆治侯公？`
+    },
+
+    {
+        date:"2025 / 04 / 04",
+        title:"课祭清明",
+        text:`未见春樱盛，一夜清明即
+故友何墓在？今客唯课行
+社义自称国，资制时卷民
+若复泥泞雨，侯将种乎疑`
+    },
+
+    {
+        date:"2025 / 10 / 23",
+        title:"夜行有感",
+        text:`天广地阔风气爽，
+两顶四壁灰盒房。
+寰宇边际尚未定，
+何故作茧自缚墙？`
+    },
+
+    {
+        date:"2026 / 08 / 11",
+        title:"念髪",
+        text:`吾有一地，呵护精细，
+高草丛生，花枝艳丽。
+暴雨袭来，狂风哈气，
+随风而舞，吸氧汲气。
+锄草机来，刀片锋利，
+杂汁四射，如诉如泣。
+茵茵绿地，百废待兴，
+春风又绿，野火不尽。`
+    }
+
+];
+
+
+/* ================= 创建左侧目录 ================= */
+
+const timeline = document.getElementById("timeline");
+const poem = document.getElementById("poem");
+
+poems.forEach((p,index)=>{
+
+    const item = document.createElement("div");
+
+    item.className = "item";
+
+    item.innerHTML = `
+        <div class="date">${p.date}</div>
+        <div class="title">${p.title}</div>
+    `;
+
+    item.addEventListener("click",()=>{
+        showPoem(index);
+    });
+
+    timeline.appendChild(item);
+
+});
+
+
+/* ================= 显示诗歌 ================= */
+
+function showPoem(index){
+
+    document.querySelectorAll(".item").forEach((item,i)=>{
+        item.classList.toggle("active",i === index);
+    });
+
+    const p = poems[index];
+
+    poem.innerHTML = `
+        <div class="poem-date">${p.date}</div>
+
+        <h2 class="poem-title">${p.title}</h2>
+
+        <div class="poem-body">${p.text}</div>
+
+        <div class="footer">
+            冰棍诗集 · ${p.date.substring(0,4)}
+        </div>
+    `;
+
+    /* 重新触发淡入动画 */
+    poem.style.animation = "none";
+    void poem.offsetWidth;
+    poem.style.animation = "fade .4s ease";
+
+    /* 切换诗歌后右侧回到顶部 */
+    document.querySelector(".content").scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+
+/* ================= 默认打开最新一首 ================= */
+
+showPoem(poems.length - 1);
+
+</script>
+
+</body>
+</html>
